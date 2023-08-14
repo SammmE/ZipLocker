@@ -79,9 +79,6 @@ if __name__ == "__main__":
     if not pyuac.isUserAdmin():
         print("Re-launching as admin!")
         pyuac.runAsAdmin()
-    else:        
-        encryptFolderPath = "./testDir"
-        key = Fernet.generate_key()
-        encryptFolder(encryptFolderPath, key, outFolderPath="./encryptedDir")
-        decryptFolder("./encryptedDir", key, outFolderPath="./decryptedDir")
+    else:
+        pass # do stuff here
 
