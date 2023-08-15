@@ -1,6 +1,5 @@
 import os
 import zipfile
-import pyuac
 from cryptography.fernet import Fernet
 
 def compressFolder(folder_path, zip_file_name, compLvl=9):
@@ -11,6 +10,14 @@ def compressFolder(folder_path, zip_file_name, compLvl=9):
                 zipf.write(file_path, os.path.relpath(file_path, folder_path))
 
 def decompressFolder(zip_file_name, extract_folder):
+    with zipfile.ZipFile(zip_file_name, 'r') as zipf:
+        zipf.extractall(extract_folder)
+
+def compressFile(file_path, zip_file_name, compLvl=9):
+    with zipfile.ZipFile(zip_file_name, 'w', zipfile.ZIP_DEFLATED, compresslevel=compLvl) as zipf:
+        zipf.write(file_path, os.path.basename(file_path))
+
+def decompressFile(zip_file_name, extract_folder):
     with zipfile.ZipFile(zip_file_name, 'r') as zipf:
         zipf.extractall(extract_folder)
 
