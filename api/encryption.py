@@ -72,13 +72,3 @@ def decryptFolder(folderPath, key, outFolderPath):
                 decryptFile(filePath, key, outFilePath=os.path.join(outFolderPath, file))
     except PermissionError as e:
         print("Error: Permission Denied.")
-
-
-
-if __name__ == "__main__":
-    if not pyuac.isUserAdmin():
-        print("Re-launching as admin!")
-        pyuac.runAsAdmin()
-    else:
-        pass # do stuff here
-
