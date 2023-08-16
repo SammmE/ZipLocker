@@ -56,10 +56,8 @@ def encryptFolder(folderPath, key, outFolderPath=None):
         for file in files:
             filePath = os.path.join(root, file)
 
-            if os.path.exists(outFolderPath):
-                print("Detected existing folder. Deleting...")
-                os.remove(outFolderPath)
-            os.mkdir(outFolderPath)
+            if not os.path.exists(outFolderPath):
+                os.mkdir(outFolderPath)
 
             encryptFile(filePath, key, outFilePath=os.path.join(outFolderPath, file))
 
@@ -71,11 +69,14 @@ def decryptFolder(folderPath, key, outFolderPath):
             for file in files:
                 filePath = os.path.join(root, file)
 
-                if os.path.exists(outFolderPath):
-                    print("Detected existing folder. Deleting...")
-                    os.remove(outFolderPath)
-                os.mkdir(outFolderPath)
+                if not os.path.exists(outFolderPath):
+                    os.mkdir(outFolderPath)
+
 
                 decryptFile(filePath, key, outFilePath=os.path.join(outFolderPath, file))
     except PermissionError as e:
         print("Error: Permission Denied.")
+
+if __name__ == "__main__":
+    password = Fernet.generate_key()
+    encryptFolder(r"C:\Users\samhi\Code\Personal\Projects\ZipLocker\api\testDir", password, r"C:\Users\samhi\Code\Personal\Projects\ZipLocker\api\testDir_enc")
