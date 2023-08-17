@@ -1,25 +1,18 @@
 import os
-import zipfile
 from cryptography.fernet import Fernet
+import zipfile
 
 def compressFolder(folder_path, zip_file_name, compLvl=9):
-    with zipfile.ZipFile(zip_file_name, 'w', zipfile.ZIP_DEFLATED, compresslevel=compLvl) as zipf:
-        for root, dirs, files in os.walk(folder_path):
-            for file in files:
-                file_path = os.path.join(root, file)
-                zipf.write(file_path, os.path.relpath(file_path, folder_path))
+    zip_file = zipfile.ZipFile(zip_file_name, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=compLvl)
+    for root, dirs, files in os.walk(folder_path):
+        for file in files:
+            zip_file.write(os.path.join(root, file))
+    zip_file.close()
 
 def decompressFolder(zip_file_name, extract_folder):
-    with zipfile.ZipFile(zip_file_name, 'r') as zipf:
-        zipf.extractall(extract_folder)
-
-def compressFile(file_path, zip_file_name, compLvl=9):
-    with zipfile.ZipFile(zip_file_name, 'w', zipfile.ZIP_DEFLATED, compresslevel=compLvl) as zipf:
-        zipf.write(file_path, os.path.basename(file_path))
-
-def decompressFile(zip_file_name, extract_folder):
-    with zipfile.ZipFile(zip_file_name, 'r') as zipf:
-        zipf.extractall(extract_folder)
+    zip_file = zipfile.ZipFile(zip_file_name, 'r')
+    zip_file.extractall(extract_folder)
+    zip_file.close()
 
 def encryptFile(filePath, key, outFilePath=None):
     if outFilePath is None:
@@ -78,5 +71,4 @@ def decryptFolder(folderPath, key, outFolderPath):
         print("Error: Permission Denied.")
 
 if __name__ == "__main__":
-    password = Fernet.generate_key()
-    encryptFolder(r"C:\Users\samhi\Code\Personal\Projects\ZipLocker\api\testDir", password, r"C:\Users\samhi\Code\Personal\Projects\ZipLocker\api\testDir_enc")
+    compressFile("./test/test.txt", "./test.zip")

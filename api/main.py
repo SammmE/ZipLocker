@@ -1,39 +1,43 @@
+import uvicorn
 
-import os
-from typer import Typer
 from cryptography.fernet import Fernet
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import encryption
 
-app = Typer()
+from pydantic import BaseModel
 
-@app.command()
-def encrypt(path: str, compLvl: int = 9, file: bool = False):
+class encrypt(BaseModel):
+    folderPath: str
+    outFolderPath: str
+
+class decrypt(BaseModel):
+    folderPath: str
+    password: str
+    outFolderPath: str
+
+app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins="*",
+    allow_credentials=True,
+    allow_methods=['*'],
+    allow_headers=['*'],
+)
+
+@app.post("/encrypt")
+def encrypt(request: encrypt):
     password = Fernet.generate_key()
-    outPath = path + ".enc"
-    if file:
-        if not os.path.exists(path) or not os.path.isfile(path):
-            print("Not a valid file path")
-        
-        encryption.encryptFile(path, password, outPath)
-        # encryption.compressFile(outPath, outPath, compLvl)
-    else:
-        if not os.path.exists(path) or os.path.isfile(path):
-            print("Not a valid folder path")
-        
-        encryption.encryptFolder(path, password, outPath)
-        # encryption.compressFolder(outPath, outPath, compLvl)
-        print(f"Encrypting folder {path} to {outPath} with compression level {compLvl}")
+    encryption.encryptFolder(request.folderPath, password, request.outFolderPath)
+    return {"status": "success", "password": password}
 
-    print(password.decode())
+@app.post("/decrypt")
+def decrypt(request: decrypt):
+    encryption.decryptFolder(request.folderPath, request.password, request.outFolderPath)
+    return {"status": "success"}
 
-@app.command()
-def decrypt(path: str, key: str, file: bool = False):
-    outPath = path.replace(".enc", "_")
-    key = bytes(key, 'utf-8')
-    if file:
-        print(f"Decrypting file {path} to {outPath} with key {key}")
-    else:
-        encryption.decryptFolder(path, key, outPath)
+def serve():
+    uvicorn.run(app, host="localhost", port=8000)
 
 if __name__ == "__main__":
-    app()
+    serve()
